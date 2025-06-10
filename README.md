@@ -1,6 +1,8 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LuckyPunt Admin Portal
 
-## Getting Started
+Admin portal for casino management built with Next.js and Supabase.
+
+## Development
 
 First, run the development server:
 
@@ -19,6 +21,15 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Login Credentials
+
+For development, use these credentials:
+
+- Email: admin@luckypunt.com
+- Password: admin123!@#
+
+**Note:** These are development credentials. For production, please change these credentials and use secure passwords.
 
 ## Learn More
 
