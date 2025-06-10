@@ -31,12 +31,12 @@ export default function DashboardPage() {
       try {
         // Fetch total players
         const { count: totalPlayers } = await supabase
-          .from('profiles')
+          .from('players')
           .select('*', { count: 'exact' })
 
         // Fetch recent players
         const { data: recentPlayers } = await supabase
-          .from('profiles')
+          .from('players')
           .select('id, email, created_at, username')
           .order('created_at', { ascending: false })
           .limit(5)

@@ -37,6 +37,7 @@ export default async function middleware(request: NextRequest) {
   return res
 }
 
+// Ensure middleware runs on all routes except public assets
 export const config = {
-  matcher: ['/', '/login', '/dashboard/:path*']
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 } 
