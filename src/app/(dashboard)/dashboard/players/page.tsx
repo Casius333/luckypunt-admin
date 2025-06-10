@@ -108,8 +108,8 @@ export default function PlayersPage() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Players List</h1>
-        <Button className="bg-green-600 hover:bg-green-700">
+        <h1 className="text-2xl font-bold text-gray-900">Players List</h1>
+        <Button className="bg-green-600 hover:bg-green-700 text-white">
           Create Player
         </Button>
       </div>
