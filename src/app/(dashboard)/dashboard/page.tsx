@@ -63,7 +63,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Dashboard Overview</h1>
+      <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
       
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="p-6">
@@ -86,7 +86,7 @@ export default function DashboardPage() {
 
       <Card>
         <div className="p-6">
-          <h2 className="text-lg font-medium">Recent Players</h2>
+          <h2 className="text-lg font-medium text-gray-900">Recent Players</h2>
           <div className="mt-6 flow-root">
             <div className="-my-5 divide-y divide-gray-200">
               {stats.recentPlayers.map((player) => (

@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card'
 export default function SportPage() {
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Sport Management</h1>
+      <h1 className="text-2xl font-bold text-gray-900">Sport Management</h1>
       
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="p-6">
@@ -26,7 +26,7 @@ export default function SportPage() {
 
       <Card>
         <div className="p-6">
-          <h2 className="text-lg font-medium">Recent Events</h2>
+          <h2 className="text-lg font-medium text-gray-900">Recent Events</h2>
           <div className="mt-6 flow-root">
             <div className="-my-5 divide-y divide-gray-200">
               <div className="py-5">
