@@ -18,7 +18,10 @@ import {
   Building2,
   MessageSquare,
   TicketCheck,
-  LogOut
+  LogOut,
+  Palette,
+  Image,
+  Gift
 } from 'lucide-react'
 
 const navigation = [
@@ -42,6 +45,15 @@ const navigation = [
   { name: 'Affiliate System', href: '/dashboard/affiliates', icon: Building2 },
   { name: 'Agent System', href: '/dashboard/agents', icon: Users },
   { name: 'Marketing', href: '/dashboard/marketing', icon: BarChart3 },
+  { 
+    name: 'Site Design',
+    href: '/dashboard/site-design',
+    icon: Palette,
+    children: [
+      { name: 'Banners', href: '/dashboard/site-design/banners' },
+    ]
+  },
+  { name: 'Promotions', href: '/dashboard/promotions', icon: Gift },
   { name: 'Platform Settings', href: '/dashboard/settings', icon: Settings },
   { name: 'CMS', href: '/dashboard/cms', icon: FileText },
   { name: 'Tickets', href: '/dashboard/tickets', icon: MessageSquare },
