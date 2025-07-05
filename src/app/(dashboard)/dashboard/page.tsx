@@ -67,17 +67,17 @@ export default function DashboardPage() {
       
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="p-6">
-          <h3 className="text-sm font-medium text-gray-500">Total Players</h3>
+          <h3 className="text-sm font-medium text-gray-700">Total Players</h3>
           <p className="mt-2 text-3xl font-bold text-gray-900">{stats.totalPlayers}</p>
         </Card>
         
         <Card className="p-6">
-          <h3 className="text-sm font-medium text-gray-500">Active Games</h3>
+          <h3 className="text-sm font-medium text-gray-700">Active Games</h3>
           <p className="mt-2 text-3xl font-bold text-gray-900">{stats.activeGames}</p>
         </Card>
         
         <Card className="p-6">
-          <h3 className="text-sm font-medium text-gray-500">Total Revenue</h3>
+          <h3 className="text-sm font-medium text-gray-700">Total Revenue</h3>
           <p className="mt-2 text-3xl font-bold text-gray-900">
             ${stats.totalRevenue.toFixed(2)}
           </p>
@@ -96,7 +96,7 @@ export default function DashboardPage() {
                       <p className="truncate text-sm font-medium text-gray-900">
                         {player.username || player.email}
                       </p>
-                      <p className="truncate text-sm text-gray-500">
+                      <p className="truncate text-sm text-gray-700">
                         Joined {new Date(player.created_at).toLocaleDateString()}
                       </p>
                     </div>
