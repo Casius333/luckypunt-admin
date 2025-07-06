@@ -568,7 +568,7 @@ export default function BannersPage() {
       type: 'main-web',
       title: 'Main Banner - Web',
       subtitle: 'Desktop hero carousel',
-      specs: '1920x400px',
+      specs: '1200x400px',
       bgColor: 'bg-blue-50',
       iconColor: 'text-blue-600',
       borderColor: 'border-blue-200',
@@ -657,8 +657,8 @@ export default function BannersPage() {
           </div>
           <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
             <p className="text-sm text-amber-800">
-              <strong>📏 Updated:</strong> Promotion banners now use a much wider, lower format (100px height) 
-              to match the frontend display and improve performance.
+              <strong>📏 Updated:</strong> Banner specifications have been standardized to 1200px width to match 
+              the actual frontend display. Promotion banners now use a much wider, lower format (100px height).
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -668,7 +668,7 @@ export default function BannersPage() {
                 <h4 className="font-medium text-gray-900">Desktop Banners</h4>
               </div>
               <div className="space-y-2 text-sm">
-                <p><strong>Main Hero:</strong> 1920x400px (4.8:1 ratio)</p>
+                <p><strong>Main Hero:</strong> 1200x400px (3:1 ratio)</p>
                 <p><strong>Promotion:</strong> 1200x100px (12:1 ratio)</p>
                 <p><strong>File Size:</strong> Max 500KB</p>
                 <p><strong>Format:</strong> WebP (preferred) or JPEG</p>
