@@ -55,6 +55,7 @@ const navigation = [
   },
   { name: 'Promotions', href: '/dashboard/promotions', icon: Gift },
   { name: 'Platform Settings', href: '/dashboard/settings', icon: Settings },
+  { name: 'Setup Database', href: '/dashboard/setup-database', icon: Settings },
   { name: 'CMS', href: '/dashboard/cms', icon: FileText },
   { name: 'Tickets', href: '/dashboard/tickets', icon: MessageSquare },
 ]
