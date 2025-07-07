@@ -372,6 +372,9 @@ function BannerCarouselModal({
                     ⚠️ Promotion banners use a very wide format (12:1 or 7.68:1 ratio)
                   </span>
                 )}
+                <span className="block mt-2 text-xs text-blue-600">
+                  💡 Keep important content within the central 80% to avoid cropping
+                </span>
               </p>
               <Button
                 type="button"
@@ -568,7 +571,7 @@ export default function BannersPage() {
       type: 'main-web',
       title: 'Main Banner - Web',
       subtitle: 'Desktop hero carousel',
-      specs: '1200x400px',
+      specs: '1200x225px',
       bgColor: 'bg-blue-50',
       iconColor: 'text-blue-600',
       borderColor: 'border-blue-200',
@@ -579,7 +582,7 @@ export default function BannersPage() {
       type: 'main-mobile',
       title: 'Main Banner - Mobile',
       subtitle: 'Mobile hero carousel',
-      specs: '800x400px',
+      specs: '800x150px',
       bgColor: 'bg-green-50',
       iconColor: 'text-green-600',
       borderColor: 'border-green-200',
@@ -657,8 +660,8 @@ export default function BannersPage() {
           </div>
           <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
             <p className="text-sm text-amber-800">
-              <strong>📏 Updated:</strong> Banner specifications have been standardized to 1200px width to match 
-              the actual frontend display. Promotion banners now use a much wider, lower format (100px height).
+              <strong>📏 Updated:</strong> Banner specifications have been standardized to match the actual frontend display. 
+              Main banners are 225px height, promotions are 100px height.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -668,7 +671,7 @@ export default function BannersPage() {
                 <h4 className="font-medium text-gray-900">Desktop Banners</h4>
               </div>
               <div className="space-y-2 text-sm">
-                <p><strong>Main Hero:</strong> 1200x400px (3:1 ratio)</p>
+                <p><strong>Main Hero:</strong> 1200x225px (5.33:1 ratio)</p>
                 <p><strong>Promotion:</strong> 1200x100px (12:1 ratio)</p>
                 <p><strong>File Size:</strong> Max 500KB</p>
                 <p><strong>Format:</strong> WebP (preferred) or JPEG</p>
@@ -680,10 +683,47 @@ export default function BannersPage() {
                 <h4 className="font-medium text-gray-900">Mobile Banners</h4>
               </div>
               <div className="space-y-2 text-sm">
-                <p><strong>Main Hero:</strong> 800x400px (2:1 ratio)</p>
+                <p><strong>Main Hero:</strong> 800x150px (5.33:1 ratio)</p>
                 <p><strong>Promotion:</strong> 768x100px (7.68:1 ratio)</p>
                 <p><strong>File Size:</strong> Max 200KB</p>
                 <p><strong>Format:</strong> WebP (preferred) or JPEG</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Design Guidelines */}
+          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <h4 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
+              🎨 Design Guidelines
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+              <div className="space-y-3">
+                <div>
+                  <h5 className="font-medium text-green-800">Safe Zone Content</h5>
+                  <p className="text-green-700">Keep important text and logos within the central 80% of the banner to avoid cropping on different screen sizes.</p>
+                </div>
+                <div>
+                  <h5 className="font-medium text-green-800">Text Readability</h5>
+                  <p className="text-green-700">Use high contrast colors and fonts 16px+ for readability. Avoid placing text over busy background areas.</p>
+                </div>
+                <div>
+                  <h5 className="font-medium text-green-800">Call-to-Action</h5>
+                  <p className="text-green-700">Place primary CTAs in the right third of the banner. Use contrasting colors to make buttons stand out.</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <h5 className="font-medium text-green-800">Brand Consistency</h5>
+                  <p className="text-green-700">Maintain consistent brand colors, fonts, and logo placement across all banners.</p>
+                </div>
+                <div>
+                  <h5 className="font-medium text-green-800">Mobile Optimization</h5>
+                  <p className="text-green-700">Ensure text is readable and CTAs are easily tappable on mobile devices. Test on various screen sizes.</p>
+                </div>
+                <div>
+                  <h5 className="font-medium text-green-800">Loading Performance</h5>
+                  <p className="text-green-700">Optimize images for web. Use WebP format when possible. Keep file sizes under the recommended limits.</p>
+                </div>
               </div>
             </div>
           </div>
