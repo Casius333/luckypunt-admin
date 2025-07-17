@@ -19,7 +19,8 @@ import {
   X,
   ChevronRight,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Calendar
 } from 'lucide-react'
 
 interface BannerImage {
@@ -30,6 +31,8 @@ interface BannerImage {
   filename?: string
   display_order: number
   is_active: boolean
+  schedule_days?: string[]
+  is_day_scheduled?: boolean
   created_at: string
   updated_at: string
 }
@@ -42,6 +45,8 @@ interface PendingImage {
   order: number
   isActive: boolean
   section: string
+  scheduleDays?: string[]
+  isDayScheduled?: boolean
 }
 
 interface BannerSection {
@@ -125,10 +130,65 @@ function BannerCarouselModal({
       file,
       order: section.images.length + pendingImages.length + index,
       isActive: true,
-      section: section.type
+      section: section.type,
+      scheduleDays: section.type.includes('promotion') ? [] : undefined,
+      isDayScheduled: section.type.includes('promotion') ? true : false
     }))
     
     setPendingImages([...pendingImages, ...newImages])
+  }
+
+  const updatePendingImageDays = (imageId: string, days: string[]) => {
+    setPendingImages(prev => prev.map(img => 
+      img.id === imageId ? { ...img, scheduleDays: days } : img
+    ))
+  }
+
+  const getUsedDays = (excludeImageId?: string) => {
+    // Get days used by existing images (excluding the one being edited)
+    const existingDays = section.images
+      .filter(img => img.id !== excludeImageId && img.schedule_days && img.schedule_days.length > 0)
+      .flatMap(img => img.schedule_days || [])
+    
+    // Get days used by pending images (excluding the one being edited)
+    const pendingDays = pendingImages
+      .filter(img => img.id !== excludeImageId && img.scheduleDays && img.scheduleDays.length > 0)
+      .flatMap(img => img.scheduleDays || [])
+    
+    return [...existingDays, ...pendingDays]
+  }
+
+  const updateExistingImageDays = async (imageId: string, days: string[]) => {
+    try {
+      const { error } = await supabase
+        .from('banner_images')
+        .update({
+          schedule_days: days,
+          is_day_scheduled: true
+        })
+        .eq('id', imageId)
+
+      if (error) {
+        console.error('Error updating image days:', error)
+        alert('Failed to update image days')
+        return false
+      }
+
+      // Update local state
+      const updatedImages = section.images.map(img => 
+        img.id === imageId 
+          ? { ...img, schedule_days: days, is_day_scheduled: true }
+          : img
+      )
+      
+      // Refresh the data
+      await onSave()
+      return true
+    } catch (error) {
+      console.error('Error updating image days:', error)
+      alert('Failed to update image days')
+      return false
+    }
   }
 
   const removePendingImage = (id: string) => {
@@ -139,6 +199,31 @@ function BannerCarouselModal({
     if (pendingImages.length === 0) {
       alert('Please add at least one image')
       return
+    }
+    
+    // Validate that promotional banners have day assignments and no conflicts
+    if (section.type.includes('promotion')) {
+      const imagesWithoutDays = pendingImages.filter(img => !img.scheduleDays || img.scheduleDays.length === 0)
+      if (imagesWithoutDays.length > 0) {
+        alert('Please assign days to all promotional banner images')
+        return
+      }
+      
+      // Check for day conflicts among pending images
+      const allPendingDays = pendingImages.flatMap(img => img.scheduleDays || [])
+      const uniqueDays = [...new Set(allPendingDays)]
+      if (allPendingDays.length !== uniqueDays.length) {
+        alert('Multiple images cannot be assigned to the same day')
+        return
+      }
+      
+      // Check for conflicts with existing images
+      const existingDays = section.images.flatMap(img => img.schedule_days || [])
+      const conflictingDays = allPendingDays.filter(day => existingDays.includes(day))
+      if (conflictingDays.length > 0) {
+        alert(`The following days are already taken: ${conflictingDays.map(d => d.charAt(0).toUpperCase() + d.slice(1)).join(', ')}`)
+        return
+      }
     }
 
     console.log('🚀 Starting carousel save process...')
@@ -188,7 +273,9 @@ function BannerCarouselModal({
             mobile_image_url: isMobile ? imageUrl : null,
             filename: pendingImage.file.name, // Store original filename
             display_order: pendingImage.order,
-            is_active: pendingImage.isActive
+            is_active: pendingImage.isActive,
+            schedule_days: pendingImage.scheduleDays || null,
+            is_day_scheduled: pendingImage.isDayScheduled || false
           }
           
           console.log('💾 Inserting banner image:', insertData)
@@ -364,9 +451,14 @@ function BannerCarouselModal({
                 id="file-upload"
               />
               <ImageIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h4 className="text-lg font-medium text-gray-900 mb-2">Add Images to Carousel</h4>
+              <h4 className="text-lg font-medium text-gray-900 mb-2">
+                {section.type.includes('promotion') ? 'Add Day-Scheduled Images' : 'Add Images to Carousel'}
+              </h4>
               <p className="text-sm text-gray-600 mb-4">
-                Upload multiple images for this carousel. Recommended: {section.specs}
+                {section.type.includes('promotion') 
+                  ? 'Upload images that will be displayed based on your selected days. Recommended: ' 
+                  : 'Upload multiple images for this carousel. Recommended: '
+                }{section.specs}
                 {section.type.includes('promotion') && (
                   <span className="block mt-1 text-xs text-amber-600">
                     ⚠️ Promotion banners use a very wide format (12:1 or 7.68:1 ratio)
@@ -385,33 +477,115 @@ function BannerCarouselModal({
               </Button>
             </div>
 
+            {/* Promotional Banner Day Assignment Info */}
+            {section.type.includes('promotion') && (
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <Calendar className="h-5 w-5 text-purple-600" />
+                  <h4 className="font-medium text-gray-900">Individual Day Assignment</h4>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Each promotional banner will be assigned to specific days of the week. Only one banner can be shown per day.
+                </p>
+                <p className="text-xs text-amber-600">
+                  💡 After uploading, assign each image to specific days below in the image settings.
+                </p>
+              </div>
+            )}
+
             {/* Pending Images */}
             {pendingImages.length > 0 && (
               <div className="space-y-3">
                 <h4 className="font-medium text-gray-900">New Images to Upload</h4>
                 {pendingImages.map((image, index) => (
-                  <div key={image.id} className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg">
-                    <div className="flex-shrink-0">
-                      <div className="h-16 w-24 bg-blue-200 rounded flex items-center justify-center">
-                        <Upload className="h-6 w-6 text-blue-600" />
+                  <div key={image.id} className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex-shrink-0">
+                        <div className="h-16 w-24 bg-blue-200 rounded flex items-center justify-center">
+                          <Upload className="h-6 w-6 text-blue-600" />
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">{image.file.name}</p>
+                        <p className="text-sm text-gray-600">
+                          {(image.file.size / 1024).toFixed(1)} KB • Order: {image.order}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removePendingImage(image.id)}
+                          title="Remove image"
+                        >
+                          <X className="h-4 w-4 text-red-500" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{image.file.name}</p>
-                      <p className="text-sm text-gray-600">
-                        {(image.file.size / 1024).toFixed(1)} KB • Order: {image.order}
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removePendingImage(image.id)}
-                        title="Remove image"
-                      >
-                        <X className="h-4 w-4 text-red-500" />
-                      </Button>
-                    </div>
+                    
+                    {/* Day Assignment for Promotional Banners */}
+                    {section.type.includes('promotion') && (
+                      <div className="mt-4 p-3 bg-white border border-purple-200 rounded-lg">
+                        <div className="flex items-center space-x-2 mb-3">
+                          <Calendar className="h-4 w-4 text-purple-600" />
+                          <h5 className="text-sm font-medium text-purple-900">Assign Days for Display:</h5>
+                        </div>
+                        <div className="grid grid-cols-7 gap-2">
+                          {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map(day => {
+                            const isSelected = image.scheduleDays?.includes(day) || false
+                            const isUsedByOther = getUsedDays().includes(day) && !isSelected
+                            
+                            return (
+                              <label key={day} className={`flex flex-col items-center p-2 border rounded-lg cursor-pointer transition-colors ${
+                                isSelected 
+                                  ? 'bg-purple-100 border-purple-300 text-purple-900' 
+                                  : isUsedByOther 
+                                    ? 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed' 
+                                    : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                              }`}>
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  disabled={isUsedByOther}
+                                  onChange={(e) => {
+                                    const currentDays = image.scheduleDays || []
+                                    const newDays = e.target.checked 
+                                      ? [...currentDays, day]
+                                      : currentDays.filter(d => d !== day)
+                                    updatePendingImageDays(image.id, newDays)
+                                  }}
+                                  className="sr-only"
+                                />
+                                <span className="text-xs font-medium">
+                                  {day.slice(0, 3).toUpperCase()}
+                                </span>
+                                <span className="text-xs mt-1">
+                                  {isUsedByOther && '❌'}
+                                  {isSelected && '✅'}
+                                </span>
+                              </label>
+                            )
+                          })}
+                        </div>
+                        <div className="mt-3 text-xs text-gray-600">
+                          <strong>Selected Days:</strong> {
+                            image.scheduleDays && image.scheduleDays.length > 0 
+                              ? image.scheduleDays.map(day => day.charAt(0).toUpperCase() + day.slice(1)).join(', ')
+                              : 'None selected (⚠️ This image will not be displayed)'
+                          }
+                        </div>
+                        {getUsedDays().length > 0 && (
+                          <div className="mt-2 text-xs text-amber-600">
+                            <strong>Days already taken:</strong> {
+                              [...new Set(getUsedDays())]
+                                .filter(day => !image.scheduleDays?.includes(day))
+                                .map(day => day.charAt(0).toUpperCase() + day.slice(1))
+                                .join(', ') || 'None'
+                            }
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -421,8 +595,15 @@ function BannerCarouselModal({
             {section.images.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-medium text-gray-900">Current Carousel Images</h4>
-                  <p className="text-sm text-gray-500">Drag to reorder or use arrow buttons</p>
+                  <h4 className="font-medium text-gray-900">
+                    {section.type.includes('promotion') ? 'Current Day-Scheduled Images' : 'Current Carousel Images'}
+                  </h4>
+                  <p className="text-sm text-gray-500">
+                    {section.type.includes('promotion') 
+                      ? 'Manage day-based display settings' 
+                      : 'Drag to reorder or use arrow buttons'
+                    }
+                  </p>
                 </div>
                 {section.images
                   .sort((a, b) => a.display_order - b.display_order)
@@ -441,6 +622,59 @@ function BannerCarouselModal({
                       <p className="text-xs text-gray-500">
                         Status: {image.is_active ? 'Active' : 'Inactive'}
                       </p>
+                      {section.type.includes('promotion') && (
+                        <div className="mt-2">
+                          <p className="text-xs text-purple-600 mb-1">
+                            <Calendar className="inline h-3 w-3 mr-1" />
+                            <strong>Assigned Days:</strong> {
+                              image.schedule_days && image.schedule_days.length > 0
+                                ? image.schedule_days.map(day => day.charAt(0).toUpperCase() + day.slice(1)).join(', ')
+                                : 'No days assigned'
+                            }
+                          </p>
+                          
+                          {/* Day Assignment Editor */}
+                          <div className="mt-2 p-2 bg-purple-50 border border-purple-200 rounded">
+                            <div className="grid grid-cols-7 gap-1">
+                              {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map(day => {
+                                const isSelected = image.schedule_days?.includes(day) || false
+                                const isUsedByOther = getUsedDays(image.id).includes(day)
+                                
+                                return (
+                                  <label key={day} className={`flex flex-col items-center p-1 border rounded cursor-pointer transition-colors text-xs ${
+                                    isSelected 
+                                      ? 'bg-purple-100 border-purple-300 text-purple-900' 
+                                      : isUsedByOther 
+                                        ? 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed' 
+                                        : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                                  }`}>
+                                    <input
+                                      type="checkbox"
+                                      checked={isSelected}
+                                      disabled={isUsedByOther}
+                                      onChange={(e) => {
+                                        const currentDays = image.schedule_days || []
+                                        const newDays = e.target.checked 
+                                          ? [...currentDays, day]
+                                          : currentDays.filter(d => d !== day)
+                                        updateExistingImageDays(image.id, newDays)
+                                      }}
+                                      className="sr-only"
+                                    />
+                                    <span className="font-medium">
+                                      {day.slice(0, 2).toUpperCase()}
+                                    </span>
+                                    <span className="text-xs">
+                                      {isUsedByOther && '❌'}
+                                      {isSelected && '✅'}
+                                    </span>
+                                  </label>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center space-x-2">
                       {/* Reorder Controls */}
@@ -759,8 +993,65 @@ export default function BannersPage() {
                 </div>
               </div>
               
-              {/* Preview Images */}
-              {section.images.length > 0 && (
+              {/* Weekly Schedule for Promotional Banners */}
+              {section.type.includes('promotion') && (
+                <div className="mt-4 p-3 bg-white border border-purple-200 rounded-lg">
+                  <h4 className="text-sm font-medium text-purple-900 mb-3 flex items-center">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Weekly Schedule
+                  </h4>
+                  <div className="grid grid-cols-7 gap-1">
+                    {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map(day => {
+                      const dayImage = section.images.find(img => img.schedule_days?.includes(day))
+                      const isToday = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase() === day
+                      
+                      return (
+                        <div key={day} className={`p-2 border rounded text-center ${
+                          isToday 
+                            ? 'border-purple-500 bg-purple-100' 
+                            : dayImage 
+                              ? 'border-green-300 bg-green-50' 
+                              : 'border-gray-200 bg-gray-50'
+                        }`}>
+                          <div className="text-xs font-medium text-gray-700 mb-1">
+                            {day.slice(0, 3).toUpperCase()}
+                            {isToday && <span className="ml-1 text-purple-600">•</span>}
+                          </div>
+                          <div className="text-xs">
+                            {dayImage ? (
+                              <div className="space-y-1">
+                                <div className="w-full h-4 bg-gray-200 rounded overflow-hidden">
+                                  <img 
+                                    src={dayImage.image_url || dayImage.mobile_image_url || ''} 
+                                    alt={day} 
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div className="text-xs text-green-600">✓</div>
+                              </div>
+                            ) : (
+                              <div className="text-gray-400 py-1">—</div>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <div className="mt-2 text-xs text-gray-600">
+                    <span className="inline-flex items-center mr-3">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full mr-1"></div>
+                      Today
+                    </span>
+                    <span className="inline-flex items-center">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                      Has banner
+                    </span>
+                  </div>
+                </div>
+              )}
+              
+              {/* Preview Images for Non-Promotional Banners */}
+              {!section.type.includes('promotion') && section.images.length > 0 && (
                 <div className="mt-4 flex space-x-2 overflow-x-auto">
                   {section.images.slice(0, 3).map(image => (
                     <img

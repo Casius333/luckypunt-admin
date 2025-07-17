@@ -10,7 +10,17 @@ import {
   Filter,
   Copy,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  User,
+  Edit,
+  Ban,
+  Key,
+  FileText,
+  CreditCard,
+  Settings,
+  Activity,
+  Flag,
+  Mail
 } from 'lucide-react'
 import {
   Tooltip,
@@ -18,6 +28,21 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { 
+  ViewPlayerProfileModal, 
+  EditPlayerInfoModal, 
+  AccountStatusModal,
+  PasswordResetModal,
+  AdminNotesModal,
+  SendEmailModal,
+  ViewTransactionsModal
+} from './PlayerModals'
+import {
+  SetLimitsModal,
+  BalanceAdjustmentModal,
+  ActivityLogModal,
+  FlagAccountModal
+} from './AdditionalModals'
 
 // Helper function to truncate text
 const TruncatedCell = ({ content, maxLength = 12 }: { content: string, maxLength?: number }) => {
@@ -58,6 +83,74 @@ const TruncatedCell = ({ content, maxLength = 12 }: { content: string, maxLength
   )
 }
 
+// Actions Dropdown Component
+const ActionsDropdown = ({ player, onActionSelect }: { player: Player, onActionSelect: (action: string, player: Player) => void }) => {
+  const [isOpen, setIsOpen] = useState(false)
+
+  const actions = [
+    { id: 'view-profile', label: 'View Player Profile', icon: User },
+    { id: 'edit-info', label: 'Edit Player Info', icon: Edit },
+    { id: 'account-status', label: 'Account Status', icon: Ban },
+    { id: 'password-reset', label: 'Password Reset', icon: Key },
+    { id: 'admin-notes', label: 'Admin Notes', icon: FileText },
+    { id: 'divider1', label: '', icon: null },
+    { id: 'view-transactions', label: 'View Transactions', icon: CreditCard },
+    { id: 'set-limits', label: 'Set Limits', icon: Settings },
+    { id: 'balance-adjustment', label: 'Balance Adjustment', icon: CreditCard },
+    { id: 'divider2', label: '', icon: null },
+    { id: 'activity-log', label: 'Activity Log', icon: Activity },
+    { id: 'flag-account', label: 'Flag Account', icon: Flag },
+    { id: 'send-email', label: 'Send Email', icon: Mail },
+  ]
+
+  const handleActionClick = (actionId: string) => {
+    if (actionId.startsWith('divider')) return
+    onActionSelect(actionId, player)
+    setIsOpen(false)
+  }
+
+  return (
+    <div className="relative">
+      <Button 
+        variant="ghost" 
+        size="sm" 
+        onClick={() => setIsOpen(!isOpen)}
+        className="h-8 w-8 p-0"
+      >
+        <MoreHorizontal className="h-4 w-4" />
+      </Button>
+      
+      {isOpen && (
+        <>
+          <div 
+            className="fixed inset-0 z-10" 
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="absolute right-0 top-8 z-20 w-56 bg-white rounded-md shadow-lg border border-gray-200 py-1">
+            {actions.map((action) => {
+              if (action.id.startsWith('divider')) {
+                return <div key={action.id} className="border-t border-gray-200 my-1" />
+              }
+              
+              const Icon = action.icon!
+              return (
+                <button
+                  key={action.id}
+                  onClick={() => handleActionClick(action.id)}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  <Icon className="h-4 w-4" />
+                  {action.label}
+                </button>
+              )
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 interface DataTableProps {
   columns: PlayerTableColumn[]
   data: Player[]
@@ -77,6 +170,77 @@ export function DataTable({
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 25
+
+  // Modal states
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null)
+  const [isViewProfileModalOpen, setIsViewProfileModalOpen] = useState(false)
+  const [isEditInfoModalOpen, setIsEditInfoModalOpen] = useState(false)
+  const [isAccountStatusModalOpen, setIsAccountStatusModalOpen] = useState(false)
+  const [isPasswordResetModalOpen, setIsPasswordResetModalOpen] = useState(false)
+  const [isAdminNotesModalOpen, setIsAdminNotesModalOpen] = useState(false)
+  const [isSendEmailModalOpen, setIsSendEmailModalOpen] = useState(false)
+  const [isViewTransactionsModalOpen, setIsViewTransactionsModalOpen] = useState(false)
+  const [isSetLimitsModalOpen, setIsSetLimitsModalOpen] = useState(false)
+  const [isBalanceAdjustmentModalOpen, setIsBalanceAdjustmentModalOpen] = useState(false)
+  const [isActivityLogModalOpen, setIsActivityLogModalOpen] = useState(false)
+  const [isFlagAccountModalOpen, setIsFlagAccountModalOpen] = useState(false)
+
+  const handleActionSelect = (action: string, player: Player) => {
+    setSelectedPlayer(player)
+    
+    switch (action) {
+      case 'view-profile':
+        setIsViewProfileModalOpen(true)
+        break
+      case 'edit-info':
+        setIsEditInfoModalOpen(true)
+        break
+      case 'account-status':
+        setIsAccountStatusModalOpen(true)
+        break
+      case 'password-reset':
+        setIsPasswordResetModalOpen(true)
+        break
+      case 'admin-notes':
+        setIsAdminNotesModalOpen(true)
+        break
+      case 'view-transactions':
+        setIsViewTransactionsModalOpen(true)
+        break
+      case 'set-limits':
+        setIsSetLimitsModalOpen(true)
+        break
+      case 'balance-adjustment':
+        setIsBalanceAdjustmentModalOpen(true)
+        break
+      case 'activity-log':
+        setIsActivityLogModalOpen(true)
+        break
+      case 'flag-account':
+        setIsFlagAccountModalOpen(true)
+        break
+      case 'send-email':
+        setIsSendEmailModalOpen(true)
+        break
+      default:
+        console.log('Unknown action:', action)
+    }
+  }
+
+  const closeModals = () => {
+    setSelectedPlayer(null)
+    setIsViewProfileModalOpen(false)
+    setIsEditInfoModalOpen(false)
+    setIsAccountStatusModalOpen(false)
+    setIsPasswordResetModalOpen(false)
+    setIsAdminNotesModalOpen(false)
+    setIsSendEmailModalOpen(false)
+    setIsViewTransactionsModalOpen(false)
+    setIsSetLimitsModalOpen(false)
+    setIsBalanceAdjustmentModalOpen(false)
+    setIsActivityLogModalOpen(false)
+    setIsFlagAccountModalOpen(false)
+  }
 
   const handleSort = (columnId: keyof Player) => {
     if (columnId === sortColumn) {
@@ -180,9 +344,7 @@ export function DataTable({
                   {columns.map((column) => (
                     <td key={column.id} className="px-4 py-2 text-gray-700 whitespace-nowrap">
                       {column.id === 'actions' ? (
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                        <ActionsDropdown player={player} onActionSelect={handleActionSelect} />
                       ) : (
                         <TruncatedCell 
                           content={player[column.id as keyof Player]?.toString() || ''} 
@@ -232,6 +394,63 @@ export function DataTable({
           </div>
         </div>
       )}
+      
+      {/* Modals */}
+      <ViewPlayerProfileModal
+        player={selectedPlayer}
+        isOpen={isViewProfileModalOpen}
+        onClose={closeModals}
+      />
+      <EditPlayerInfoModal
+        player={selectedPlayer}
+        isOpen={isEditInfoModalOpen}
+        onClose={closeModals}
+      />
+      <AccountStatusModal
+        player={selectedPlayer}
+        isOpen={isAccountStatusModalOpen}
+        onClose={closeModals}
+      />
+      <PasswordResetModal
+        player={selectedPlayer}
+        isOpen={isPasswordResetModalOpen}
+        onClose={closeModals}
+      />
+      <AdminNotesModal
+        player={selectedPlayer}
+        isOpen={isAdminNotesModalOpen}
+        onClose={closeModals}
+      />
+      <SendEmailModal
+        player={selectedPlayer}
+        isOpen={isSendEmailModalOpen}
+        onClose={closeModals}
+      />
+      <ViewTransactionsModal
+        player={selectedPlayer}
+        isOpen={isViewTransactionsModalOpen}
+        onClose={closeModals}
+      />
+      <SetLimitsModal
+        player={selectedPlayer}
+        isOpen={isSetLimitsModalOpen}
+        onClose={closeModals}
+      />
+      <BalanceAdjustmentModal
+        player={selectedPlayer}
+        isOpen={isBalanceAdjustmentModalOpen}
+        onClose={closeModals}
+      />
+      <ActivityLogModal
+        player={selectedPlayer}
+        isOpen={isActivityLogModalOpen}
+        onClose={closeModals}
+      />
+      <FlagAccountModal
+        player={selectedPlayer}
+        isOpen={isFlagAccountModalOpen}
+        onClose={closeModals}
+      />
     </div>
   )
 } 

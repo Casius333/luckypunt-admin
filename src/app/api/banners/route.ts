@@ -29,38 +29,59 @@ export async function GET(request: NextRequest) {
       )
     }
     
+    // Filter by current day for promotional banners with day scheduling
+    const currentDay = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase()
+    const filteredBanners = bannerImages?.filter(banner => {
+      // If this is a promotional banner and has day scheduling
+      if (banner.banner_id?.includes('promotion') && banner.is_day_scheduled) {
+        // Only include if the current day matches the banner's scheduled days
+        const scheduleDays = banner.schedule_days || []
+        return scheduleDays.includes(currentDay)
+      }
+      // For non-promotional banners, include all
+      return true
+    }) || []
+    
     // Format the response for frontend consumption
     const formattedBanners = {
-      'main-web': bannerImages?.filter(img => img.banner_id === 'main-web').map(img => ({
+      'main-web': filteredBanners?.filter(img => img.banner_id === 'main-web').map(img => ({
         id: img.id,
         imageUrl: img.image_url,
         filename: img.filename,
         displayOrder: img.display_order,
         isActive: img.is_active,
+        scheduleDays: img.schedule_days,
+        isDayScheduled: img.is_day_scheduled,
         createdAt: img.created_at
       })) || [],
-      'main-mobile': bannerImages?.filter(img => img.banner_id === 'main-mobile').map(img => ({
+      'main-mobile': filteredBanners?.filter(img => img.banner_id === 'main-mobile').map(img => ({
         id: img.id,
         imageUrl: img.mobile_image_url,
         filename: img.filename,
         displayOrder: img.display_order,
         isActive: img.is_active,
+        scheduleDays: img.schedule_days,
+        isDayScheduled: img.is_day_scheduled,
         createdAt: img.created_at
       })) || [],
-      'promotion-web': bannerImages?.filter(img => img.banner_id === 'promotion-web').map(img => ({
+      'promotion-web': filteredBanners?.filter(img => img.banner_id === 'promotion-web').map(img => ({
         id: img.id,
         imageUrl: img.image_url,
         filename: img.filename,
         displayOrder: img.display_order,
         isActive: img.is_active,
+        scheduleDays: img.schedule_days,
+        isDayScheduled: img.is_day_scheduled,
         createdAt: img.created_at
       })) || [],
-      'promotion-mobile': bannerImages?.filter(img => img.banner_id === 'promotion-mobile').map(img => ({
+      'promotion-mobile': filteredBanners?.filter(img => img.banner_id === 'promotion-mobile').map(img => ({
         id: img.id,
         imageUrl: img.mobile_image_url,
         filename: img.filename,
         displayOrder: img.display_order,
         isActive: img.is_active,
+        scheduleDays: img.schedule_days,
+        isDayScheduled: img.is_day_scheduled,
         createdAt: img.created_at
       })) || []
     }

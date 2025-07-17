@@ -34,14 +34,11 @@ const navigation = [
     icon: Users,
     children: [
       { name: 'List', href: '/dashboard/players' },
-      { name: 'Segmentation', href: '/dashboard/players/segmentation' },
-      { name: 'Verification', href: '/dashboard/players/verification' },
     ]
   },
+  { name: 'Transactions', href: '/dashboard/transactions', icon: CreditCard },
   { name: 'Casino', href: '/dashboard/casino', icon: Gamepad2 },
   { name: 'Providers Limits', href: '/dashboard/providers', icon: Boxes },
-  { name: 'Sport', href: '/dashboard/sport', icon: BarChart3 },
-  { name: 'Transactions', href: '/dashboard/transactions', icon: CreditCard },
   { name: 'Affiliate System', href: '/dashboard/affiliates', icon: Building2 },
   { name: 'Agent System', href: '/dashboard/agents', icon: Users },
   { name: 'Marketing', href: '/dashboard/marketing', icon: BarChart3 },
@@ -55,7 +52,6 @@ const navigation = [
   },
   { name: 'Promotions', href: '/dashboard/promotions', icon: Gift },
   { name: 'Platform Settings', href: '/dashboard/settings', icon: Settings },
-  { name: 'Setup Database', href: '/dashboard/setup-database', icon: Settings },
   { name: 'CMS', href: '/dashboard/cms', icon: FileText },
   { name: 'Tickets', href: '/dashboard/tickets', icon: MessageSquare },
 ]

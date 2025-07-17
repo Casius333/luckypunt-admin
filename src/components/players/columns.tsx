@@ -12,20 +12,8 @@ export const columns: PlayerTableColumn[] = [
     sortable: false
   },
   {
-    id: 'email',
-    label: 'User Email',
-    sortable: true,
-    filterable: true
-  },
-  {
     id: 'username',
     label: 'Username',
-    sortable: true,
-    filterable: true
-  },
-  {
-    id: 'full_name',
-    label: 'Full Name',
     sortable: true,
     filterable: true
   },
@@ -48,7 +36,7 @@ export const columns: PlayerTableColumn[] = [
   },
   {
     id: 'updated_at',
-    label: 'Last Updated',
+    label: 'Last Activity',
     sortable: true
   }
 ] 
