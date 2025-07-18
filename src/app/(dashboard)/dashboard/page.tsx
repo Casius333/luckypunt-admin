@@ -8,7 +8,6 @@ import {
   TrendingUp, 
   TrendingDown, 
   Users, 
-  DollarSign, 
   ArrowUpDown, 
   AlertTriangle,
   Eye,
@@ -123,41 +122,7 @@ export default function DashboardPage() {
     </div>
   )
 
-  const KPICard = ({ 
-    title, 
-    value, 
-    change, 
-    icon: Icon, 
-    format = 'number' 
-  }: {
-    title: string
-    value: number
-    change: number
-    icon: any
-    format?: 'number' | 'currency'
-  }) => (
-    <Card className="p-6 hover:shadow-lg transition-shadow">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">
-            {format === 'currency' ? `$${value.toLocaleString()}` : value.toLocaleString()}
-          </p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Icon className="h-8 w-8 text-gray-400" />
-          <div className={`flex items-center ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {change >= 0 ? (
-              <TrendingUp className="h-4 w-4 mr-1" />
-            ) : (
-              <TrendingDown className="h-4 w-4 mr-1" />
-            )}
-            <span className="text-sm font-medium">{Math.abs(change)}%</span>
-          </div>
-        </div>
-      </div>
-    </Card>
-  )
+
 
   if (isLoading) {
     return (

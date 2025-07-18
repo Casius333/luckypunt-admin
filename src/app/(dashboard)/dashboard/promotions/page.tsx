@@ -5,7 +5,6 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { createClient } from '@supabase/supabase-js'
 import { 
   Plus, 
   Edit2, 
@@ -51,18 +50,7 @@ interface Promotion {
   updated_at?: string
 }
 
-interface UserPromotion {
-  id: string
-  user_id: string
-  promotion_id: string
-  status: 'active' | 'completed' | 'expired' | 'cancelled'
-  bonus_amount?: number
-  wagering_requirement?: number
-  wagering_progress: number
-  activated_at: string
-  completed_at?: string
-  expired_at?: string
-}
+
 
 export default function PromotionsPage() {
   const [promotions, setPromotions] = useState<Promotion[]>([])
@@ -76,7 +64,7 @@ export default function PromotionsPage() {
 
   useEffect(() => {
     fetchPromotions()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchPromotions = async () => {
     try {
@@ -161,16 +149,7 @@ export default function PromotionsPage() {
     })
   }
 
-  const formatDateTime = (dateString: string) => {
-    if (!dateString) return 'Not set'
-    return new Date(dateString).toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
+
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -240,7 +219,7 @@ export default function PromotionsPage() {
       const startAt = formData.get('start_at') ? new Date(formData.get('start_at') as string).toISOString() : null
       const endAt = formData.get('end_at') ? new Date(formData.get('end_at') as string).toISOString() : null
       
-      const promotionData: any = {
+      const promotionData = {
         name: formData.get('name') as string,
         description: formData.get('description') as string,
         bonus_percent: formData.get('bonus_percent') ? parseFloat(formData.get('bonus_percent') as string) : null,
@@ -691,7 +670,7 @@ export default function PromotionsPage() {
                     </div>
                   </div>
                   <div className="mt-2 text-sm text-gray-600">
-                    <p>💡 <strong>Tip:</strong> For recurring promotions (like "Every Sunday"), set the end date to 1-2 years in the future so the promotion runs until that date.</p>
+                    <p>💡 <strong>Tip:</strong> For recurring promotions (like &ldquo;Every Sunday&rdquo;), set the end date to 1-2 years in the future so the promotion runs until that date.</p>
                   </div>
                 </div>
                 

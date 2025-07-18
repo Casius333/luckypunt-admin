@@ -1,14 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { 
   Plus, 
   Upload, 
-  Edit2, 
   Trash2, 
   Eye, 
   EyeOff, 
@@ -57,7 +56,7 @@ interface BannerSection {
   bgColor: string
   iconColor: string
   borderColor: string
-  icon: any
+  icon: React.ComponentType<{ className?: string }>
   images: BannerImage[]
 }
 
@@ -174,13 +173,6 @@ function BannerCarouselModal({
         return false
       }
 
-      // Update local state
-      const updatedImages = section.images.map(img => 
-        img.id === imageId 
-          ? { ...img, schedule_days: days, is_day_scheduled: true }
-          : img
-      )
-      
       // Refresh the data
       await onSave()
       return true
@@ -497,7 +489,7 @@ function BannerCarouselModal({
             {pendingImages.length > 0 && (
               <div className="space-y-3">
                 <h4 className="font-medium text-gray-900">New Images to Upload</h4>
-                {pendingImages.map((image, index) => (
+                {pendingImages.map((image) => (
                   <div key={image.id} className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                     <div className="flex items-center space-x-4">
                       <div className="flex-shrink-0">
@@ -610,9 +602,11 @@ function BannerCarouselModal({
                   .map((image, index) => (
                   <div key={image.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                     <div className="flex-shrink-0">
-                      <img
+                      <Image
                         src={image.image_url || image.mobile_image_url || ''}
                         alt={`${section.title} image ${index + 1}`}
+                        width={96}
+                        height={64}
                         className="h-16 w-24 object-cover rounded"
                       />
                     </div>
@@ -766,7 +760,7 @@ export default function BannersPage() {
 
   useEffect(() => {
     fetchBannerImages()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchBannerImages = async () => {
     try {
@@ -1066,9 +1060,11 @@ export default function BannersPage() {
                             {dayImage ? (
                               <div className="space-y-1">
                                 <div className="w-full h-4 bg-gray-200 rounded overflow-hidden">
-                                  <img 
+                                  <Image 
                                     src={dayImage.image_url || dayImage.mobile_image_url || ''} 
                                     alt={day} 
+                                    width={32}
+                                    height={16}
                                     className="w-full h-full object-cover"
                                   />
                                 </div>
@@ -1099,10 +1095,12 @@ export default function BannersPage() {
               {!section.type.includes('promotion') && section.images.length > 0 && (
                 <div className="mt-4 flex space-x-2 overflow-x-auto">
                   {section.images.slice(0, 3).map(image => (
-                    <img
+                    <Image
                       key={image.id}
                       src={image.image_url || image.mobile_image_url || ''}
                       alt="Banner preview"
+                      width={80}
+                      height={48}
                       className="h-12 w-20 object-cover rounded flex-shrink-0"
                     />
                   ))}

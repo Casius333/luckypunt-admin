@@ -28,8 +28,8 @@ export default function LoginPage() {
       if (data?.user) {
         router.replace('/dashboard')
       }
-    } catch (error: any) {
-      setError(error.message || 'Failed to login')
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Failed to login')
     } finally {
       setLoading(false)
     }

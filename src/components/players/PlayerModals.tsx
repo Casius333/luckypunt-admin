@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -13,8 +12,6 @@ import {
   Shield, 
   CreditCard,
   Activity,
-  MapPin,
-  Phone,
   Edit2,
   Save,
   Ban,
@@ -48,13 +45,12 @@ export function ViewPlayerProfileModal({ player, isOpen, onClose }: PlayerModalP
     flaggedTransactions: 0
   })
   const [isLoading, setIsLoading] = useState(true)
-  const supabase = createClientComponentClient()
 
   useEffect(() => {
     if (player && isOpen) {
       fetchPlayerStats()
     }
-  }, [player, isOpen])
+  }, [player, isOpen]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchPlayerStats = async () => {
     if (!player) return

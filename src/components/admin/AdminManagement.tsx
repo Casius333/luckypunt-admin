@@ -6,8 +6,17 @@ import { Button } from '@/components/ui/button'
 import type { AdminRole } from '@/types/admin'
 import { canAccessFeature } from '@/lib/admin'
 
+interface AdminUser {
+  id: string
+  user_id: string
+  email: string
+  full_name?: string
+  role: AdminRole
+  created_at: string
+}
+
 export default function AdminManagement() {
-  const [admins, setAdmins] = useState<any[]>([])
+  const [admins, setAdmins] = useState<AdminUser[]>([])
   const [currentUserRole, setCurrentUserRole] = useState<AdminRole | null>(null)
   const [newAdminEmail, setNewAdminEmail] = useState('')
   const [newAdminRole, setNewAdminRole] = useState<AdminRole>('admin')
@@ -43,9 +52,9 @@ export default function AdminManagement() {
 
       setAdmins(adminUsers || [])
       setError(null)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error loading admins:', err)
-      setError(err.message)
+      setError(err instanceof Error ? err.message : 'Failed to load admins')
     }
   }
 
@@ -78,9 +87,9 @@ export default function AdminManagement() {
       setNewAdminEmail('')
       loadAdmins()
       setError(null)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error creating admin:', err)
-      setError(err.message)
+      setError(err instanceof Error ? err.message : 'Failed to create admin')
     }
   }
 
@@ -95,9 +104,9 @@ export default function AdminManagement() {
 
       loadAdmins()
       setError(null)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error deleting admin:', err)
-      setError(err.message)
+      setError(err instanceof Error ? err.message : 'Failed to delete admin')
     }
   }
 

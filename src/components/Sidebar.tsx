@@ -10,17 +10,14 @@ import {
   FileText,
   CreditCard,
   Users,
-  BadgeCheck,
   Gamepad2,
   Boxes,
   Settings,
   BarChart3,
   Building2,
   MessageSquare,
-  TicketCheck,
   LogOut,
   Palette,
-  Image,
   Gift
 } from 'lucide-react'
 

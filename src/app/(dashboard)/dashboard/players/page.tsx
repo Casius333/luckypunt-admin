@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { Settings, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/players/data-table'
 import { columns } from '@/components/players/columns'
-import type { Player, PlayerListFilters, KycStatus, AccountStatus } from '@/types/player'
+import type { Player, PlayerListFilters } from '@/types/player'
 
 export default function PlayersPage() {
   const [players, setPlayers] = useState<Player[]>([])

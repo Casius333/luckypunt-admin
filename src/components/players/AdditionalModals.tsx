@@ -15,7 +15,6 @@ import {
   DollarSign,
   TrendingUp,
   TrendingDown,
-  Calendar,
   Monitor,
   MapPin,
   Clock

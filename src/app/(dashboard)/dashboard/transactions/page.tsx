@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { Calendar, Download, TrendingUp, TrendingDown, DollarSign, Clock } from 'lucide-react'
+import { Download, TrendingUp, TrendingDown, DollarSign, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { DataTable } from '@/components/transactions/data-table'
 import { columns } from '@/components/transactions/columns'
-import type { Transaction, TransactionListFilters, TransactionType, TransactionStatus, PaymentMethod } from '@/types/transaction'
+import type { Transaction, TransactionListFilters } from '@/types/transaction'
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -89,7 +89,7 @@ export default function TransactionsPage() {
             .rpc('get_user_emails_for_transactions', { user_ids: userIds })
 
           if (!userError && userData) {
-            userEmails = userData.reduce((acc: { [key: string]: string }, user: any) => {
+            userEmails = userData.reduce((acc: { [key: string]: string }, user: { user_id: string; email: string }) => {
               acc[user.user_id] = user.email
               return acc
             }, {})
@@ -139,7 +139,6 @@ export default function TransactionsPage() {
   const totalDeposits = transactions.filter(t => t.type === 'deposit').reduce((sum, t) => sum + t.amount, 0)
   const totalWithdrawals = transactions.filter(t => t.type === 'withdrawal').reduce((sum, t) => sum + t.amount, 0)
   const pendingCount = transactions.filter(t => t.status === 'pending').length
-  const completedCount = transactions.filter(t => t.status === 'completed').length
 
   // Set default date range to last 30 days
   const setLast30Days = () => {

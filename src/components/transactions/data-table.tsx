@@ -8,7 +8,6 @@ import {
   MoreHorizontal, 
   Search,
   Filter,
-  Copy,
   ChevronLeft,
   ChevronRight,
   Eye,
@@ -134,11 +133,8 @@ export function DataTable({
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(25)
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
 
   const handleActionSelect = (action: string, transaction: Transaction) => {
-    setSelectedTransaction(transaction)
-    
     switch (action) {
       case 'view-details':
         // TODO: Open transaction details modal
@@ -197,24 +193,24 @@ export function DataTable({
   const startIndex = (currentPage - 1) * itemsPerPage
   const paginatedData = sortedData.slice(startIndex, startIndex + itemsPerPage)
 
-  const formatValue = (value: any, columnId: string) => {
+  const formatValue = (value: unknown, columnId: string) => {
     if (value === null || value === undefined) return ''
     
     switch (columnId) {
       case 'amount':
-        return typeof value === 'number' ? `$${value.toFixed(2)}` : value
+        return typeof value === 'number' ? `$${value.toFixed(2)}` : String(value)
       case 'created_at':
       case 'updated_at':
       case 'processed_at':
-        return value ? new Date(value).toLocaleDateString() : ''
+        return typeof value === 'string' && value ? new Date(value).toLocaleDateString() : ''
       case 'status':
-        return value ? value.charAt(0).toUpperCase() + value.slice(1) : ''
+        return typeof value === 'string' && value ? value.charAt(0).toUpperCase() + value.slice(1) : ''
       case 'type':
-        return value ? value.charAt(0).toUpperCase() + value.slice(1) : ''
+        return typeof value === 'string' && value ? value.charAt(0).toUpperCase() + value.slice(1) : ''
       case 'payment_method':
-        return value ? value.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) : ''
+        return typeof value === 'string' && value ? value.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) : ''
       default:
-        return value.toString()
+        return String(value)
     }
   }
 

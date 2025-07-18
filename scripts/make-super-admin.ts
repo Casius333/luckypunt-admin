@@ -21,8 +21,9 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 
 async function makeSuperAdmin() {
   try {
-    // First get the user's ID from auth.users
-    const { data: { user }, error: userError } = await supabase.auth.admin.getUserByEmail('chad@spxdigi.com')
+    // First get the user's ID from auth.users - using listUsers instead of deprecated getUserByEmail
+    const { data: { users }, error: userError } = await supabase.auth.admin.listUsers()
+    const user = users.find(u => u.email === 'chad@spxdigi.com')
 
     if (userError || !user) {
       throw userError || new Error('User not found')
