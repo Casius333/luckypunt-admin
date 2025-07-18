@@ -770,25 +770,50 @@ export default function BannersPage() {
 
   const fetchBannerImages = async () => {
     try {
+      console.log('🔍 Starting fetchBannerImages...')
+      
+      // Check authentication status first
+      const { data: { session }, error: authError } = await supabase.auth.getSession()
+      
+      if (authError) {
+        console.error('Authentication error:', authError)
+        throw new Error(`Authentication failed: ${authError.message}`)
+      }
+      
+      if (!session) {
+        console.error('No active session found')
+        throw new Error('No active session - please log in again')
+      }
+      
+      console.log('✅ Session valid, fetching banner images...')
+      
       const { data, error } = await supabase
         .from('banner_images')
         .select('*')
         .order('display_order', { ascending: true })
 
       if (error) {
-        console.error('Error fetching banner images:', {
+        console.error('Database error fetching banner images:', {
           error,
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
+          message: error?.message || 'No error message',
+          details: error?.details || 'No details',
+          hint: error?.hint || 'No hint',
+          code: error?.code || 'No code',
+          errorType: typeof error,
+          errorString: JSON.stringify(error)
         })
         setBannerImages([])
       } else {
+        console.log('✅ Successfully fetched banner images:', data?.length || 0, 'items')
         setBannerImages(data || [])
       }
     } catch (error) {
-      console.error('Error fetching banner images:', error)
+      console.error('Catch block - Error fetching banner images:', {
+        error,
+        message: error instanceof Error ? error.message : 'Unknown error',
+        type: typeof error,
+        errorString: JSON.stringify(error)
+      })
       setBannerImages([])
     } finally {
       setLoading(false)
@@ -872,13 +897,33 @@ export default function BannersPage() {
             Manage carousel images for each banner type and device. Click on a banner type to manage its images.
           </p>
         </div>
-        <Button
-          variant="secondary"
-          onClick={() => setShowSpecs(!showSpecs)}
-        >
-          <Info className="h-4 w-4 mr-2" />
-          Image Specs
-        </Button>
+        <div className="flex space-x-2">
+          <Button
+            variant="ghost"
+            onClick={async () => {
+              setLoading(true)
+              try {
+                // Clear any cached session data
+                await supabase.auth.signOut()
+                // Force page reload to clear all state
+                window.location.reload()
+              } catch (error) {
+                console.error('Error refreshing session:', error)
+                setLoading(false)
+              }
+            }}
+            title="Clear session and reload if experiencing authentication issues"
+          >
+            🔄 Refresh Session
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setShowSpecs(!showSpecs)}
+          >
+            <Info className="h-4 w-4 mr-2" />
+            Image Specs
+          </Button>
+        </div>
       </div>
 
 
